@@ -1,29 +1,32 @@
+/**
+ * Account - 銀行帳戶類別
+ * 定義帳戶的基本屬性與行為 (存款、提款、餘額查詢)
+ */
 public class Account {
-    private static int accountCount = 0; // 帳戶數量統計
+    // 靜態變數：計算總開戶數
+    private static int accountCount = 0;
 
-    // 帳戶號碼，唯一識別每個帳戶
-    private String accountNumber;
-    // 帳戶擁有者名稱
-    private String ownerName;
-    // 帳戶餘額
-    private double balance;
+    private String accountNumber; // 帳號
+    private String ownerName;     // 戶名
+    private double balance;       // 餘額
 
-    /**
-     * 建構子，初始化帳戶號碼與初始餘額
-     * @param accountNumber 帳戶號碼
-     * @param initialBalance 初始餘額
-     */
+    // ========== 建構子 ==========
+
+    // 完整建構子
     public Account(String accountNumber, String ownerName, double initialBalance) {
-        this.setAccountNumber(accountNumber);
+        this.accountNumber = accountNumber;
         this.ownerName = ownerName;
-        try {
-            this.setBalance(initialBalance);
-        } catch (IllegalArgumentException e) {
-            System.out.println("初始餘額錯誤: " + e.getMessage() + "，將餘額設為0");
+
+        // 檢查初始餘額
+        if (initialBalance < 0) {
+            throw new IllegalArgumentException("初始餘額不能為負數");
         }
-        accountCount++; // 帳戶數量加1
+        this.balance = initialBalance;
+
+        accountCount++; // 開戶數 +1
     }
 
+    // 建構子過載 (Overloading)
     public Account(String accountNumber, double initialBalance) {
         this(accountNumber, "未知", initialBalance);
     }
@@ -36,74 +39,50 @@ public class Account {
         this(accountNumber, "未知", 0);
     }
 
-    /**
-     * 取得帳戶號碼
-     * @return 帳戶號碼
-     */
-    public String getAccountNumber() {
-        return accountNumber;
-    }
+    // ========== Getter 方法 ==========
+    public String getAccountNumber() { return accountNumber; }
+    public double getBalance() { return balance; }
+    public String getOwnerName() { return ownerName; }
+    public static int getAccountCount() { return accountCount; }
 
-    /**
-     * 取得帳戶餘額
-     * @return 帳戶餘額
-     */
-    public double getBalance() {
-        return balance;
-    }
-
-    /**
-     * 取得帳戶擁有者名稱
-     * @return 帳戶擁有者名稱
-     */
-    public String getOwnerName() {
-        return ownerName;
-    }
-
-    /**
-     * 設定帳戶餘額
-     * @param balance 欲設定的帳戶餘額，必須為正數
-     * @throws IllegalArgumentException 若餘額非正數則拋出例外
-     */
-    public void setBalance(double balance) {
-        if (balance > 0) {
-            this.balance = balance; // 設定新的帳戶餘額
-        } else {
-            throw new IllegalArgumentException("帳戶餘額必須為正數");
-        }
-    }
-
-    /**
-     * 設定帳戶號碼
-     * @param accountNumber 欲設定的帳戶號碼
-     */
+    // ========== Setter 方法 ==========
     public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
     }
 
-    /**
-     * 存款方法，將指定金額存入帳戶
-     * @param amount 存入金額，必須為正數
-     * @throws IllegalArgumentException 若金額非正數則拋出例外
-     */
-    public void deposit(double amount) {
-        if (amount > 0) {
-            balance += amount; // 增加餘額
-        } else {
-            throw new IllegalArgumentException("存款金額必須為正數");
+    // 通常不建議直接 setBalance，建議透過存提款修改，但若作業要求則保留
+    public void setBalance(double balance) {
+        if (balance < 0) {
+            throw new IllegalArgumentException("餘額不能為負數");
         }
+        this.balance = balance;
     }
 
-    /**
-     * 提款方法，從帳戶扣除指定金額
-     * @param amount 提款金額，必須為正數且不得超過餘額
-     * @throws IllegalArgumentException 若金額不合法則拋出例外
-     */
-    public void withdraw(double amount) {
-        if (amount > 0 && amount <= balance) {
-            balance -= amount; // 減少餘額
-        } else {
-            throw new IllegalArgumentException("提款金額不合法");
+    // ========== 業務邏輯方法 ==========
+
+    // 存款
+    public void deposit(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("存款金額必須為正數");
         }
+        balance += amount;
+        System.out.println("✅ 成功存入 $" + amount + "，目前餘額: $" + balance);
+    }
+
+    // 提款
+    public void withdraw(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("提款金額必須為正數");
+        }
+        if (amount > balance) {
+            throw new IllegalArgumentException("餘額不足！目前餘額: " + balance + "，欲提款: " + amount);
+        }
+        balance -= amount;
+        System.out.println("✅ 成功取出 $" + amount + "，目前餘額: $" + balance);
+    }
+
+    @Override
+    public String toString() {
+        return "帳號: " + accountNumber + " | 戶名: " + ownerName + " | 餘額: $" + balance;
     }
 }
