@@ -9,6 +9,7 @@ public class CharacterCounter {
         int letters = 0, digits = 0, spaces = 0, others = 0;
         
         for (int i = 0; i < input.length(); i++) {
+            char ch = input.charAt(i);
             if (Character.isLetter(ch)) {
                 letters++;
             } else if (Character.isDigit(ch)) {
